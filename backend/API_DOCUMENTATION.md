@@ -304,6 +304,538 @@ Authorization: Bearer <jwt_token>
 
 ---
 
+## Restaurant Endpoints
+
+### 1. Get User's Restaurant
+Get the authenticated user's restaurant with all floors and tables.
+
+**Endpoint:** `GET /restaurants`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "My Restaurant",
+  "userId": 1,
+  "shareToken": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:00:00.000Z",
+  "floors": [
+    {
+      "id": 1,
+      "name": "Floor 1",
+      "floorNumber": 1,
+      "restaurantId": 1,
+      "createdAt": "2026-02-01T10:00:00.000Z",
+      "updatedAt": "2026-02-01T10:00:00.000Z",
+      "tables": [
+        {
+          "id": 1,
+          "name": "T1",
+          "shape": "round",
+          "capacity": 4,
+          "status": "available",
+          "x": 20.5,
+          "y": 30.2,
+          "width": 8.0,
+          "height": 8.0,
+          "floorId": 1,
+          "createdAt": "2026-02-01T10:00:00.000Z",
+          "updatedAt": "2026-02-01T10:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Restaurant not found"
+}
+```
+
+---
+
+### 2. Create Restaurant
+Create a new restaurant for the authenticated user (if they don't have one).
+
+**Endpoint:** `POST /restaurants`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "My Restaurant"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "My Restaurant",
+  "userId": 1,
+  "shareToken": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:00:00.000Z",
+  "floors": [
+    {
+      "id": 1,
+      "name": "Floor 1",
+      "floorNumber": 1,
+      "restaurantId": 1,
+      "createdAt": "2026-02-01T10:00:00.000Z",
+      "updatedAt": "2026-02-01T10:00:00.000Z",
+      "tables": []
+    }
+  ]
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "error": "Restaurant already exists"
+}
+```
+
+---
+
+### 3. Update Restaurant
+Update the authenticated user's restaurant name.
+
+**Endpoint:** `PUT /restaurants`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Updated Restaurant Name"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "Updated Restaurant Name",
+  "userId": 1,
+  "shareToken": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:05:00.000Z",
+  "floors": [...]
+}
+```
+
+---
+
+## Floor Endpoints
+
+### 1. Get All Floors
+Get all floors for the authenticated user's restaurant.
+
+**Endpoint:** `GET /floors`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Floor 1",
+    "floorNumber": 1,
+    "restaurantId": 1,
+    "createdAt": "2026-02-01T10:00:00.000Z",
+    "updatedAt": "2026-02-01T10:00:00.000Z",
+    "tables": [
+      {
+        "id": 1,
+        "name": "T1",
+        "shape": "round",
+        "capacity": 4,
+        "status": "available",
+        "x": 20.5,
+        "y": 30.2,
+        "width": 8.0,
+        "height": 8.0,
+        "floorId": 1
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Floor 2",
+    "floorNumber": 2,
+    "restaurantId": 1,
+    "createdAt": "2026-02-01T11:00:00.000Z",
+    "updatedAt": "2026-02-01T11:00:00.000Z",
+    "tables": []
+  }
+]
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Restaurant not found"
+}
+```
+
+---
+
+### 2. Get Single Floor
+Get a specific floor by ID with all its tables.
+
+**Endpoint:** `GET /floors/:floorId`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `GET /floors/1`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "Floor 1",
+  "floorNumber": 1,
+  "restaurantId": 1,
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:00:00.000Z",
+  "tables": [
+    {
+      "id": 1,
+      "name": "T1",
+      "shape": "round",
+      "capacity": 4,
+      "status": "available",
+      "x": 20.5,
+      "y": 30.2,
+      "width": 8.0,
+      "height": 8.0,
+      "floorId": 1
+    }
+  ]
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Floor not found"
+}
+```
+
+---
+
+### 3. Create Floor
+Create a new floor for the authenticated user's restaurant.
+
+**Endpoint:** `POST /floors`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Floor 2"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 2,
+  "name": "Floor 2",
+  "floorNumber": 2,
+  "restaurantId": 1,
+  "createdAt": "2026-02-01T11:00:00.000Z",
+  "updatedAt": "2026-02-01T11:00:00.000Z",
+  "tables": []
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Restaurant not found"
+}
+```
+
+---
+
+### 4. Update Floor
+Update a floor's name.
+
+**Endpoint:** `PUT /floors/:floorId`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Main Floor"
+}
+```
+
+**Example:** `PUT /floors/1`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "Main Floor",
+  "floorNumber": 1,
+  "restaurantId": 1,
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T11:30:00.000Z",
+  "tables": [...]
+}
+```
+
+---
+
+### 5. Delete Floor
+Delete a floor and all its tables.
+
+**Endpoint:** `DELETE /floors/:floorId`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `DELETE /floors/2`
+
+**Response (200 OK):**
+```json
+{
+  "message": "Floor deleted successfully"
+}
+```
+
+**Error Response (500):**
+```json
+{
+  "error": "Internal server error"
+}
+```
+
+---
+
+## Table Endpoints
+
+### 1. Get All Tables for a Floor
+Get all tables for a specific floor.
+
+**Endpoint:** `GET /tables/floor/:floorId`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `GET /tables/floor/1`
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "name": "T1",
+    "shape": "round",
+    "capacity": 4,
+    "status": "available",
+    "x": 20.5,
+    "y": 30.2,
+    "width": 8.0,
+    "height": 8.0,
+    "floorId": 1,
+    "createdAt": "2026-02-01T10:00:00.000Z",
+    "updatedAt": "2026-02-01T10:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "T2",
+    "shape": "square",
+    "capacity": 2,
+    "status": "occupied",
+    "x": 45.0,
+    "y": 25.0,
+    "width": 8.0,
+    "height": 8.0,
+    "floorId": 1,
+    "createdAt": "2026-02-01T10:00:00.000Z",
+    "updatedAt": "2026-02-01T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### 2. Create Table
+Create a new table on a floor.
+
+**Endpoint:** `POST /tables`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "floorId": 1,
+  "name": "T1",
+  "shape": "round",
+  "capacity": 4,
+  "status": "available",
+  "x": 20.5,
+  "y": 30.2,
+  "width": 8.0,
+  "height": 8.0
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "T1",
+  "shape": "round",
+  "capacity": 4,
+  "status": "available",
+  "x": 20.5,
+  "y": 30.2,
+  "width": 8.0,
+  "height": 8.0,
+  "floorId": 1,
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:00:00.000Z"
+}
+```
+
+**Field Descriptions:**
+- `floorId` (required): ID of the floor where the table will be placed
+- `name` (required): Name/label for the table (e.g., "T1", "Table 1")
+- `shape` (required): Shape of the table ("round", "square", or "rectangle")
+- `capacity` (required): Number of seats at the table
+- `status` (optional): Table status ("available", "occupied", "reserved") - defaults to "available"
+- `x` (required): X coordinate on the floor plan (percentage)
+- `y` (required): Y coordinate on the floor plan (percentage)
+- `width` (required): Width of the table on the floor plan
+- `height` (required): Height of the table on the floor plan
+
+---
+
+### 3. Update Table
+Update an existing table's properties.
+
+**Endpoint:** `PUT /tables/:tableId`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body** (all fields optional):
+```json
+{
+  "name": "T1-Updated",
+  "shape": "square",
+  "capacity": 6,
+  "status": "reserved",
+  "x": 25.0,
+  "y": 35.0,
+  "width": 10.0,
+  "height": 10.0
+}
+```
+
+**Example:** `PUT /tables/1`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "T1-Updated",
+  "shape": "square",
+  "capacity": 6,
+  "status": "reserved",
+  "x": 25.0,
+  "y": 35.0,
+  "width": 10.0,
+  "height": 10.0,
+  "floorId": 1,
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T12:00:00.000Z"
+}
+```
+
+---
+
+### 4. Delete Table
+Delete a table from a floor.
+
+**Endpoint:** `DELETE /tables/:tableId`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `DELETE /tables/1`
+
+**Response (200 OK):**
+```json
+{
+  "message": "Table deleted successfully"
+}
+```
+
+**Error Response (500):**
+```json
+{
+  "error": "Internal server error"
+}
+```
+
+---
+
 ## Health Check
 **Endpoint:** `GET /health`
 
@@ -377,6 +909,72 @@ curl -X GET http://localhost:5000/api/reservations \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
+### Get Restaurant
+```bash
+curl -X GET http://localhost:5000/api/restaurants \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Create Restaurant
+```bash
+curl -X POST http://localhost:5000/api/restaurants \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Restaurant"
+  }'
+```
+
+### Create Floor
+```bash
+curl -X POST http://localhost:5000/api/floors \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Floor 2"
+  }'
+```
+
+### Get All Floors
+```bash
+curl -X GET http://localhost:5000/api/floors \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Create Table
+```bash
+curl -X POST http://localhost:5000/api/tables \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "floorId": 1,
+    "name": "T1",
+    "shape": "round",
+    "capacity": 4,
+    "status": "available",
+    "x": 20.5,
+    "y": 30.2,
+    "width": 8.0,
+    "height": 8.0
+  }'
+```
+
+### Get Tables for Floor
+```bash
+curl -X GET http://localhost:5000/api/tables/floor/1 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Update Table
+```bash
+curl -X PUT http://localhost:5000/api/tables/1 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "occupied"
+  }'
+```
+
 ---
 
 ## Notes
@@ -384,3 +982,11 @@ curl -X GET http://localhost:5000/api/reservations \
 - JWT tokens expire after 7 days (configurable in .env)
 - Reservation times are stored in UTC and converted to the user's timezone on the frontend
 - Each user can only access their own reservations
+- Each user can have only one restaurant
+- A restaurant is automatically created with an initial floor when first created
+- Floor numbers are automatically assigned sequentially starting from 1
+- Table positions (x, y) are stored as percentages of the floor plan dimensions
+- Table shapes can be: "round", "square", or "rectangle"
+- Table statuses can be: "available", "occupied", or "reserved"
+- All restaurant, floor, and table endpoints require authentication
+- Share tokens are automatically generated when creating a restaurant
