@@ -31,13 +31,16 @@ interface AddTableDialogProps {
     name: string
     shape: TableShape
     capacity: number
+    workerId?: number
   }) => void
+  employees?: Array<{ id: number; name: string; role: string }>
 }
 
-export function AddTableDialog({ open, onOpenChange, onAddTable }: AddTableDialogProps) {
+export function AddTableDialog({ open, onOpenChange, onAddTable, employees = [] }: AddTableDialogProps) {
   const [name, setName] = useState("")
   const [shape, setShape] = useState<TableShape>("round")
   const [capacity, setCapacity] = useState("4")
+  const [workerId, setWorkerId] = useState<string>("")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,13 +49,15 @@ export function AddTableDialog({ open, onOpenChange, onAddTable }: AddTableDialo
     onAddTable({
       name: name.trim(),
       shape,
-      capacity: parseInt(capacity, 10)
+      capacity: parseInt(capacity, 10),
+      ...(workerId && { workerId: parseInt(workerId, 10) })
     })
     
     // Reset form
     setName("")
     setShape("round")
     setCapacity("4")
+    setWorkerId("")
     onOpenChange(false)
   }
 
@@ -136,6 +141,26 @@ export function AddTableDialog({ open, onOpenChange, onAddTable }: AddTableDialo
               </SelectContent>
             </Select>
           </div>
+
+          {/* Worker Assignment - Only show if employees are provided */}
+          {employees.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="worker">Assigned Worker (Optional)</Label>
+              <Select value={workerId} onValueChange={setWorkerId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="No worker assigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No worker assigned</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id.toString()}>
+                      {employee.name} ({employee.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
