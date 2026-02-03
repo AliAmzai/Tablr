@@ -66,3 +66,104 @@ export const reservationsAPI = {
   update: (id: number, data: UpdateReservationData) => apiClient.put<{ message: string; reservation: Reservation }>(`/reservations/${id}`, data),
   delete: (id: number) => apiClient.delete<{ message: string }>(`/reservations/${id}`),
 };
+
+// Employee types
+export interface Employee {
+  id: number;
+  restaurantId: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+  tables?: Array<{
+    id: number;
+    name: string;
+    capacity?: number;
+  }>;
+}
+
+export interface CreateEmployeeData {
+  restaurantId: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+}
+
+export interface UpdateEmployeeData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+}
+
+// Restaurant types
+export interface Restaurant {
+  id: number;
+  userId: number;
+  name: string;
+  description?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  shareToken: string;
+  createdAt: string;
+  updatedAt: string;
+  floors?: Floor[];
+  employees?: Employee[];
+  locations?: Location[];
+}
+
+export interface Floor {
+  id: number;
+  restaurantId: number;
+  name: string;
+  floorNumber: number;
+  createdAt: string;
+  updatedAt: string;
+  tables?: Table[];
+}
+
+export interface Table {
+  id: number;
+  floorId: number;
+  name: string;
+  shape: string;
+  capacity: number;
+  status: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  workerId?: number;
+  worker?: {
+    id: number;
+    name: string;
+    role: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Location {
+  id: number;
+  restaurantId: number;
+  name: string;
+  address: string;
+  phone: string;
+  city?: string;
+  country?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Employees API calls
+export const employeesAPI = {
+  create: (data: CreateEmployeeData) => apiClient.post<Employee>('/employees', data),
+  getAll: (restaurantId: number) => apiClient.get<Employee[]>(`/employees?restaurantId=${restaurantId}`),
+  getOne: (id: number) => apiClient.get<Employee>(`/employees/${id}`),
+  update: (id: number, data: UpdateEmployeeData) => apiClient.put<Employee>(`/employees/${id}`, data),
+  delete: (id: number) => apiClient.delete<{ message: string }>(`/employees/${id}`),
+};
+
