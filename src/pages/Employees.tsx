@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -34,11 +34,11 @@ const Employees: FC = () => {
   const deleteEmployee = useDeleteEmployee();
 
   // Set first restaurant as selected
-  useState(() => {
+  useEffect(() => {
     if (restaurants.length > 0 && !selectedRestaurantId) {
       setSelectedRestaurantId(restaurants[0].id);
     }
-  });
+  }, [restaurants, selectedRestaurantId]);
 
   const handleOpenDialog = (employee?: any) => {
     if (employee) {
