@@ -6,49 +6,85 @@ import crypto from 'crypto';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Get user's restaurant
+// Get user's restaurants (all or specific one by ID)
 router.get('/', authenticate, async (req, res) => {
   try {
-    const restaurant = await prisma.restaurant.findFirst({
+    const { id } = req.query;
+
+    // If ID is provided, get specific restaurant
+    if (id) {
+      const restaurant = await prisma.restaurant.findFirst({
+        where: { 
+          id: parseInt(id),
+          userId: req.userId 
+        },
+        include: {
+          floors: {
+            include: { 
+              tables: {
+                include: {
+                  worker: true
+                }
+              }
+            },
+            orderBy: { floorNumber: 'asc' }
+          },
+          employees: true,
+          locations: true
+        }
+      });
+
+      if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+      }
+
+      return res.json(restaurant);
+    }
+
+    // Otherwise, get all restaurants
+    const restaurants = await prisma.restaurant.findMany({
       where: { userId: req.userId },
       include: {
         floors: {
-          include: { tables: true },
+          include: { 
+            tables: {
+              include: {
+                worker: true
+              }
+            }
+          },
           orderBy: { floorNumber: 'asc' }
-        }
-      }
+        },
+        employees: true,
+        locations: true
+      },
+      orderBy: { createdAt: 'desc' }
     });
 
-    if (!restaurant) {
-      return res.status(404).json({ error: 'Restaurant not found' });
-    }
-
-    res.json(restaurant);
+    res.json(restaurants);
   } catch (error) {
-    console.error('Error fetching restaurant:', error);
+    console.error('Error fetching restaurants:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Create restaurant (for users without one)
+// Create restaurant (allows multiple per user)
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, description, contactEmail, contactPhone } = req.body;
 
-    // Check if restaurant already exists
-    const existingRestaurant = await prisma.restaurant.findFirst({
-      where: { userId: req.userId }
-    });
-
-    if (existingRestaurant) {
-      return res.status(400).json({ error: 'Restaurant already exists' });
+    if (!name) {
+      return res.status(400).json({ error: 'Restaurant name is required' });
     }
 
     // Create restaurant with initial floor
     const shareToken = crypto.randomBytes(16).toString('hex');
     const restaurant = await prisma.restaurant.create({
       data: {
-        name: name || 'My Restaurant',
+        name,
+        description: description || null,
+        contactEmail: contactEmail || null,
+        contactPhone: contactPhone || null,
         userId: req.userId,
         shareToken,
         floors: {
@@ -61,7 +97,9 @@ router.post('/', authenticate, async (req, res) => {
       include: {
         floors: {
           include: { tables: true }
-        }
+        },
+        employees: true,
+        locations: true
       }
     });
 
@@ -72,27 +110,78 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// Update restaurant
-router.put('/', authenticate, async (req, res) => {
+// Update restaurant (by ID)
+router.put('/:id', authenticate, async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, description, contactEmail, contactPhone } = req.body;
+
+    // Verify user owns this restaurant
+    const existingRestaurant = await prisma.restaurant.findFirst({
+      where: {
+        id: parseInt(req.params.id),
+        userId: req.userId
+      }
+    });
+
+    if (!existingRestaurant) {
+      return res.status(404).json({ error: 'Restaurant not found' });
+    }
 
     const restaurant = await prisma.restaurant.update({
       where: {
-        userId: req.userId
+        id: parseInt(req.params.id)
       },
-      data: { name },
+      data: {
+        ...(name && { name }),
+        ...(description !== undefined && { description: description || null }),
+        ...(contactEmail !== undefined && { contactEmail: contactEmail || null }),
+        ...(contactPhone !== undefined && { contactPhone: contactPhone || null })
+      },
       include: {
         floors: {
-          include: { tables: true },
+          include: { 
+            tables: {
+              include: {
+                worker: true
+              }
+            }
+          },
           orderBy: { floorNumber: 'asc' }
-        }
+        },
+        employees: true,
+        locations: true
       }
     });
 
     res.json(restaurant);
   } catch (error) {
     console.error('Error updating restaurant:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete restaurant
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    // Verify user owns this restaurant
+    const restaurant = await prisma.restaurant.findFirst({
+      where: {
+        id: parseInt(req.params.id),
+        userId: req.userId
+      }
+    });
+
+    if (!restaurant) {
+      return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    await prisma.restaurant.delete({
+      where: { id: parseInt(req.params.id) }
+    });
+
+    res.json({ message: 'Restaurant deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting restaurant:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

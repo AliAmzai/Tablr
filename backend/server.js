@@ -6,6 +6,7 @@ import reservationRoutes from './routes/reservations.js';
 import restaurantsRoutes from './routes/restaurants.js';
 import floorsRoutes from './routes/floors.js';
 import tablesRoutes from './routes/tables.js';
+import employeesRoutes from './routes/employees.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/restaurants', restaurantsRoutes);
 app.use('/api/floors', floorsRoutes);
 app.use('/api/tables', tablesRoutes);
+app.use('/api/employees', employeesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
