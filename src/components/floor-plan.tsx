@@ -24,6 +24,11 @@ export interface Table {
     time: string
     guests: number
   }
+  worker?: {
+    id: number
+    name: string
+    role: string
+  }
 }
 
 interface FloorPlanProps {

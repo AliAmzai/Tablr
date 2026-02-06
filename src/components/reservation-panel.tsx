@@ -96,6 +96,19 @@ export function ReservationPanel({ selectedTable, onUpdateStatus, onClose }: Res
             <span>Capacity: {selectedTable.capacity}</span>
           </div>
         </div>
+
+        {/* Assigned Worker Info */}
+        {selectedTable.worker && (
+          <div className="p-3 bg-muted/50 rounded-lg space-y-1">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-indigo-600" />
+              <span className="font-medium text-sm">Assigned Worker</span>
+            </div>
+            <div className="text-sm text-muted-foreground ml-6">
+              {selectedTable.worker.name} - {selectedTable.worker.role}
+            </div>
+          </div>
+        )}
         
         {/* Current Reservation Info */}
         {selectedTable.reservation && (

@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Calendar, LayoutDashboard, Home, Moon, Sun, LogOut, TableProperties, Users, Settings, Loader2 } from 'lucide-react';
+import { Calendar, LayoutDashboard, Home, Moon, Sun, LogOut, TableProperties, Users, Settings, Loader2, Briefcase } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLogout } from '../hooks/useAuth';
 import { useAuthContext } from '../context/AuthContext';
@@ -35,6 +35,7 @@ const DashboardLayout: FC = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: TableProperties, label: 'Tables', path: '/tables' },
+    { icon: Briefcase, label: 'Employees', path: '/employees' },
     { icon: Users, label: 'Customers', path: '/customers' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];

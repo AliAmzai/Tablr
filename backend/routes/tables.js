@@ -10,6 +10,15 @@ router.get('/floor/:floorId', authenticate, async (req, res) => {
   try {
     const tables = await prisma.table.findMany({
       where: { floorId: parseInt(req.params.floorId) },
+      include: {
+        worker: {
+          select: {
+            id: true,
+            name: true,
+            role: true
+          }
+        }
+      }
     });
 
     res.json(tables);
@@ -22,7 +31,7 @@ router.get('/floor/:floorId', authenticate, async (req, res) => {
 // Create new table
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { floorId, name, shape, capacity, status, x, y, width, height } = req.body;
+    const { floorId, name, shape, capacity, status, x, y, width, height, workerId } = req.body;
 
     const table = await prisma.table.create({
       data: {
@@ -35,7 +44,17 @@ router.post('/', authenticate, async (req, res) => {
         y: parseFloat(y),
         width: parseFloat(width),
         height: parseFloat(height),
+        ...(workerId && { workerId: parseInt(workerId) })
       },
+      include: {
+        worker: {
+          select: {
+            id: true,
+            name: true,
+            role: true
+          }
+        }
+      }
     });
 
     res.status(201).json(table);
@@ -48,7 +67,7 @@ router.post('/', authenticate, async (req, res) => {
 // Update table
 router.put('/:tableId', authenticate, async (req, res) => {
   try {
-    const { name, shape, capacity, status, x, y, width, height } = req.body;
+    const { name, shape, capacity, status, x, y, width, height, workerId } = req.body;
 
     const table = await prisma.table.update({
       where: { id: parseInt(req.params.tableId) },
@@ -61,7 +80,17 @@ router.put('/:tableId', authenticate, async (req, res) => {
         ...(y !== undefined && { y: parseFloat(y) }),
         ...(width && { width: parseFloat(width) }),
         ...(height && { height: parseFloat(height) }),
+        ...(workerId !== undefined && { workerId: workerId ? parseInt(workerId) : null })
       },
+      include: {
+        worker: {
+          select: {
+            id: true,
+            name: true,
+            role: true
+          }
+        }
+      }
     });
 
     res.json(table);

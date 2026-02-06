@@ -43,6 +43,7 @@ model Restaurant {
   locations       Location[]
   floors          Floor[]
   reservations    Reservation[]
+  employees       Employee[]
 
   @@map("restaurants")
 }
@@ -83,6 +84,8 @@ model Table {
   id              Int     @id @default(autoincrement())
   floorId         Int
   floor           Floor   @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  workerId        Int?
+  worker          Employee? @relation(fields: [workerId], references: [id], onDelete: SetNull)
   
   name            String
   shape           String  // round, square, rectangular
@@ -97,6 +100,24 @@ model Table {
   updatedAt       DateTime @updatedAt
 
   @@map("tables")
+}
+
+model Employee {
+  id              Int     @id @default(autoincrement())
+  restaurantId    Int
+  restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  
+  name            String
+  email           String?
+  phone           String?
+  role            String  @default("waiter") // waiter, chef, manager, etc.
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tables          Table[]
+
+  @@map("employees")
 }
 
 model Reservation {

@@ -977,16 +977,655 @@ curl -X PUT http://localhost:5000/api/tables/1 \
 
 ---
 
+---
+
+## Employee Endpoints
+
+### 1. Get All Employees for a Restaurant
+Get all employees for a specific restaurant.
+
+**Endpoint:** `GET /employees?restaurantId={restaurantId}`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Query Parameters:**
+- `restaurantId` (required): ID of the restaurant
+
+**Example:** `GET /employees?restaurantId=1`
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "restaurantId": 1,
+    "name": "John Smith",
+    "email": "john@example.com",
+    "phone": "+1 (555) 123-4567",
+    "role": "waiter",
+    "createdAt": "2026-02-03T10:00:00.000Z",
+    "updatedAt": "2026-02-03T10:00:00.000Z",
+    "tables": [
+      {
+        "id": 1,
+        "name": "T1"
+      },
+      {
+        "id": 2,
+        "name": "T2"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "restaurantId": 1,
+    "name": "Jane Doe",
+    "email": null,
+    "phone": "+1 (555) 987-6543",
+    "role": "chef",
+    "createdAt": "2026-02-03T11:00:00.000Z",
+    "updatedAt": "2026-02-03T11:00:00.000Z",
+    "tables": []
+  }
+]
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Restaurant not found"
+}
+```
+
+---
+
+### 2. Get Single Employee
+Get details of a specific employee.
+
+**Endpoint:** `GET /employees/:id`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `GET /employees/1`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "restaurantId": 1,
+  "name": "John Smith",
+  "email": "john@example.com",
+  "phone": "+1 (555) 123-4567",
+  "role": "waiter",
+  "createdAt": "2026-02-03T10:00:00.000Z",
+  "updatedAt": "2026-02-03T10:00:00.000Z",
+  "restaurant": {
+    "id": 1,
+    "name": "My Restaurant",
+    "userId": 1
+  },
+  "tables": [
+    {
+      "id": 1,
+      "name": "T1",
+      "capacity": 4
+    }
+  ]
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Employee not found"
+}
+```
+
+---
+
+### 3. Create Employee
+Create a new employee for a restaurant.
+
+**Endpoint:** `POST /employees`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "restaurantId": 1,
+  "name": "John Smith",
+  "email": "john@example.com",
+  "phone": "+1 (555) 123-4567",
+  "role": "waiter"
+}
+```
+
+**Field Descriptions:**
+- `restaurantId` (required): ID of the restaurant
+- `name` (required): Employee's full name
+- `email` (optional): Employee's email address
+- `phone` (optional): Employee's phone number
+- `role` (optional): Employee role - defaults to "waiter". Common values: "waiter", "chef", "manager", "host", "bartender"
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "restaurantId": 1,
+  "name": "John Smith",
+  "email": "john@example.com",
+  "phone": "+1 (555) 123-4567",
+  "role": "waiter",
+  "createdAt": "2026-02-03T10:00:00.000Z",
+  "updatedAt": "2026-02-03T10:00:00.000Z",
+  "tables": []
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "error": "Restaurant ID and name are required"
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Restaurant not found"
+}
+```
+
+---
+
+### 4. Update Employee
+Update an existing employee's information.
+
+**Endpoint:** `PUT /employees/:id`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body** (all fields optional):
+```json
+{
+  "name": "John Smith Jr.",
+  "email": "john.smith@example.com",
+  "phone": "+1 (555) 999-8888",
+  "role": "manager"
+}
+```
+
+**Example:** `PUT /employees/1`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "restaurantId": 1,
+  "name": "John Smith Jr.",
+  "email": "john.smith@example.com",
+  "phone": "+1 (555) 999-8888",
+  "role": "manager",
+  "createdAt": "2026-02-03T10:00:00.000Z",
+  "updatedAt": "2026-02-03T12:30:00.000Z",
+  "tables": [
+    {
+      "id": 1,
+      "name": "T1"
+    }
+  ]
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Employee not found"
+}
+```
+
+---
+
+### 5. Delete Employee
+Delete an employee from a restaurant.
+
+**Endpoint:** `DELETE /employees/:id`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `DELETE /employees/1`
+
+**Response (200 OK):**
+```json
+{
+  "message": "Employee deleted successfully"
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Employee not found"
+}
+```
+
+---
+
+## Updated Restaurant Endpoints
+
+### Note on Multiple Restaurants
+Users can now create and manage multiple restaurants. The following endpoints have been updated:
+
+### 1. Get User's Restaurants
+Get all restaurants for the authenticated user, or a specific one by ID.
+
+**Endpoint:** `GET /restaurants` or `GET /restaurants?id={restaurantId}`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Query Parameters:**
+- `id` (optional): Specific restaurant ID to retrieve
+
+**Response (200 OK) - All Restaurants:**
+```json
+[
+  {
+    "id": 1,
+    "name": "My Restaurant",
+    "description": "Fine dining experience",
+    "contactEmail": "contact@restaurant.com",
+    "contactPhone": "+1 (555) 000-0000",
+    "userId": 1,
+    "shareToken": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+    "createdAt": "2026-02-01T10:00:00.000Z",
+    "updatedAt": "2026-02-01T10:00:00.000Z",
+    "floors": [...],
+    "employees": [...],
+    "locations": [...]
+  }
+]
+```
+
+**Response (200 OK) - Single Restaurant:**
+```json
+{
+  "id": 1,
+  "name": "My Restaurant",
+  "description": "Fine dining experience",
+  "contactEmail": "contact@restaurant.com",
+  "contactPhone": "+1 (555) 000-0000",
+  "userId": 1,
+  "shareToken": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:00:00.000Z",
+  "floors": [...],
+  "employees": [...],
+  "locations": [...]
+}
+```
+
+---
+
+### 2. Create Restaurant
+Create a new restaurant (users can now have multiple).
+
+**Endpoint:** `POST /restaurants`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "My New Restaurant",
+  "description": "A cozy bistro",
+  "contactEmail": "info@bistro.com",
+  "contactPhone": "+1 (555) 111-2222"
+}
+```
+
+**Field Descriptions:**
+- `name` (required): Restaurant name
+- `description` (optional): Brief description
+- `contactEmail` (optional): Contact email
+- `contactPhone` (optional): Contact phone
+
+**Response (201 Created):**
+```json
+{
+  "id": 2,
+  "name": "My New Restaurant",
+  "description": "A cozy bistro",
+  "contactEmail": "info@bistro.com",
+  "contactPhone": "+1 (555) 111-2222",
+  "userId": 1,
+  "shareToken": "x1y2z3a4b5c6d7e8f9g0h1i2j3k4l5m6",
+  "createdAt": "2026-02-03T10:00:00.000Z",
+  "updatedAt": "2026-02-03T10:00:00.000Z",
+  "floors": [
+    {
+      "id": 1,
+      "name": "Floor 1",
+      "floorNumber": 1,
+      "restaurantId": 2,
+      "tables": []
+    }
+  ],
+  "employees": [],
+  "locations": []
+}
+```
+
+---
+
+### 3. Update Restaurant
+Update a specific restaurant by ID.
+
+**Endpoint:** `PUT /restaurants/:id`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Request Body** (all fields optional):
+```json
+{
+  "name": "Updated Restaurant Name",
+  "description": "Updated description",
+  "contactEmail": "new@email.com",
+  "contactPhone": "+1 (555) 333-4444"
+}
+```
+
+**Example:** `PUT /restaurants/1`
+
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "name": "Updated Restaurant Name",
+  "description": "Updated description",
+  "contactEmail": "new@email.com",
+  "contactPhone": "+1 (555) 333-4444",
+  "userId": 1,
+  "shareToken": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-03T11:00:00.000Z",
+  "floors": [...],
+  "employees": [...],
+  "locations": [...]
+}
+```
+
+---
+
+### 4. Delete Restaurant
+Delete a specific restaurant by ID.
+
+**Endpoint:** `DELETE /restaurants/:id`
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Example:** `DELETE /restaurants/1`
+
+**Response (200 OK):**
+```json
+{
+  "message": "Restaurant deleted successfully"
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "error": "Restaurant not found"
+}
+```
+
+---
+
+## Updated Table Endpoints
+
+### Worker Assignment
+Tables can now be assigned to employees (workers) for tracking purposes.
+
+### 1. Get All Tables for a Floor
+Get all tables for a specific floor (now includes worker information).
+
+**Endpoint:** `GET /tables/floor/:floorId`
+
+**Response includes worker data:**
+```json
+[
+  {
+    "id": 1,
+    "name": "T1",
+    "shape": "round",
+    "capacity": 4,
+    "status": "available",
+    "x": 20.5,
+    "y": 30.2,
+    "width": 8.0,
+    "height": 8.0,
+    "floorId": 1,
+    "workerId": 1,
+    "worker": {
+      "id": 1,
+      "name": "John Smith",
+      "role": "waiter"
+    },
+    "createdAt": "2026-02-01T10:00:00.000Z",
+    "updatedAt": "2026-02-01T10:00:00.000Z"
+  }
+]
+```
+
+---
+
+### 2. Create Table with Worker Assignment
+Create a new table on a floor with optional worker assignment.
+
+**Endpoint:** `POST /tables`
+
+**Request Body:**
+```json
+{
+  "floorId": 1,
+  "name": "T1",
+  "shape": "round",
+  "capacity": 4,
+  "status": "available",
+  "x": 20.5,
+  "y": 30.2,
+  "width": 8.0,
+  "height": 8.0,
+  "workerId": 1
+}
+```
+
+**Field Descriptions:**
+- `workerId` (optional): ID of the employee to assign to this table
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "T1",
+  "shape": "round",
+  "capacity": 4,
+  "status": "available",
+  "x": 20.5,
+  "y": 30.2,
+  "width": 8.0,
+  "height": 8.0,
+  "floorId": 1,
+  "workerId": 1,
+  "worker": {
+    "id": 1,
+    "name": "John Smith",
+    "role": "waiter"
+  },
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-01T10:00:00.000Z"
+}
+```
+
+---
+
+### 3. Update Table
+Update table properties including worker assignment.
+
+**Endpoint:** `PUT /tables/:tableId`
+
+**Request Body** (all fields optional):
+```json
+{
+  "name": "T1-Updated",
+  "workerId": 2
+}
+```
+
+**Note:** To remove worker assignment, set `workerId` to `null`
+
+**Response includes updated worker data:**
+```json
+{
+  "id": 1,
+  "name": "T1-Updated",
+  "shape": "round",
+  "capacity": 4,
+  "status": "available",
+  "x": 20.5,
+  "y": 30.2,
+  "width": 8.0,
+  "height": 8.0,
+  "floorId": 1,
+  "workerId": 2,
+  "worker": {
+    "id": 2,
+    "name": "Jane Doe",
+    "role": "waiter"
+  },
+  "createdAt": "2026-02-01T10:00:00.000Z",
+  "updatedAt": "2026-02-03T12:00:00.000Z"
+}
+```
+
+---
+
+## Testing with cURL
+
+### Create Employee
+```bash
+curl -X POST http://localhost:5000/api/employees \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "restaurantId": 1,
+    "name": "John Smith",
+    "email": "john@example.com",
+    "phone": "+1 (555) 123-4567",
+    "role": "waiter"
+  }'
+```
+
+### Get All Employees
+```bash
+curl -X GET "http://localhost:5000/api/employees?restaurantId=1" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Update Employee
+```bash
+curl -X PUT http://localhost:5000/api/employees/1 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Smith Jr.",
+    "role": "manager"
+  }'
+```
+
+### Delete Employee
+```bash
+curl -X DELETE http://localhost:5000/api/employees/1 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Create Restaurant
+```bash
+curl -X POST http://localhost:5000/api/restaurants \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My New Restaurant",
+    "description": "A cozy bistro"
+  }'
+```
+
+### Create Table with Worker
+```bash
+curl -X POST http://localhost:5000/api/tables \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "floorId": 1,
+    "name": "T1",
+    "shape": "round",
+    "capacity": 4,
+    "status": "available",
+    "x": 20.5,
+    "y": 30.2,
+    "width": 8.0,
+    "height": 8.0,
+    "workerId": 1
+  }'
+```
+
+---
+
 ## Notes
 - Timestamps are in ISO 8601 format (UTC)
 - JWT tokens expire after 7 days (configurable in .env)
 - Reservation times are stored in UTC and converted to the user's timezone on the frontend
 - Each user can only access their own reservations
-- Each user can have only one restaurant
+- Users can now have multiple restaurants
 - A restaurant is automatically created with an initial floor when first created
 - Floor numbers are automatically assigned sequentially starting from 1
 - Table positions (x, y) are stored as percentages of the floor plan dimensions
 - Table shapes can be: "round", "square", or "rectangle"
 - Table statuses can be: "available", "occupied", or "reserved"
-- All restaurant, floor, and table endpoints require authentication
+- Employee roles can be: "waiter", "chef", "manager", "host", "bartender", or custom values
+- Worker assignment to tables is optional
+- When an employee is deleted, tables assigned to them will have workerId set to null
+- All restaurant, floor, table, and employee endpoints require authentication
 - Share tokens are automatically generated when creating a restaurant
